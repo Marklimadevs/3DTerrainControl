@@ -13,7 +13,7 @@ public class MousePosition : MonoBehaviour
     [SerializeField] MouseClass _MouseClass;
     [SerializeField] bool GridMovig;
     [SerializeField] public bool InGrid;
-    [SerializeField] public bool EnableGridMode;
+    [SerializeField] public bool _EnableGridMode;
     [SerializeField] GameObject CursorGO;
 
     public LayerMask LayerMaskIgnoreWater;
@@ -42,7 +42,7 @@ public class MousePosition : MonoBehaviour
             if (Physics.Raycast(ray, out RaycastHit raycastHit, 1000f, LayerMaskIgnoreWater))
             {
                 Vector3 tilepos = Vector3.zero;
-                if (EnableGridMode)
+                if (_EnableGridMode)
                 {
                     tilepos = _MeshCreator.GetCenterVerticePosition(raycastHit.point);
                 }
@@ -65,5 +65,9 @@ public class MousePosition : MonoBehaviour
             }
         }
         return MainCamera.transform.position ;
+    }
+    public void EnableGridMode(bool value)
+    {
+        _EnableGridMode = value;
     }
 }

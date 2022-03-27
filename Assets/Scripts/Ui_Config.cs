@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Ui_Config : MonoBehaviour
 {
+
     public void SizeMap(int value)
     {
         MeshCreator mesh = GameObject.FindObjectOfType<MeshCreator>();
