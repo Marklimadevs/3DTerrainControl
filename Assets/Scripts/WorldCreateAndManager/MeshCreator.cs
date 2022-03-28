@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshCreator : MonoBehaviour
@@ -14,8 +16,8 @@ public class MeshCreator : MonoBehaviour
     MeshFilter meshfilter;
 
 
-    [SerializeField] [Range(-5f,0f)] int LimteMin;
-    [SerializeField] [Range( 0f, 5f)] int LimteMax;
+    [SerializeField] [Range(-20f,0f)] int LimteMin;
+    [SerializeField] [Range( 0f, 20f)] int LimteMax;
     [SerializeField] Material _DefaulMaterial;
 
     Color[] Colors;
@@ -27,21 +29,33 @@ public class MeshCreator : MonoBehaviour
     public Vector3[] _vertices;
     public int[] _triangles;
 
+
+    [SerializeField] TextMeshProUGUI Text_XSize;
+    [SerializeField] TextMeshProUGUI Text_ZSize;
+    [SerializeField] TextMeshProUGUI Text_MinY;
+    [SerializeField] TextMeshProUGUI Text_MaxY;
     #endregion
 
     private void Start()
     {
-        //CreatePoint();
+        //get components
         mesh = new Mesh();
         _MeshRenderer = GetComponent<MeshRenderer>();
         GetComponent<MeshFilter>().mesh = mesh;
         meshCollider = GetComponent<MeshCollider>();
         meshfilter = GetComponent<MeshFilter>();
-        CreateShape();
+
+        //Create Mash
+        StartCoroutine(CreateShape());
         UpdateMesh();
 
+        //UpdateTexts
+        if (Text_MaxY != null) Text_MaxY.SetText(LimteMax.ToString());
+        if (Text_MinY != null) Text_MinY.SetText(LimteMin.ToString());
+        if (Text_ZSize != null) Text_ZSize.SetText(_zSize.ToString());
+        if (Text_XSize != null) Text_XSize.SetText(_xSize.ToString());
     }
-    void CreateShape()
+    IEnumerator CreateShape()
     {
         _vertices = new Vector3[(_xSize + 1) * (_zSize + 1)];
 
@@ -51,6 +65,7 @@ public class MeshCreator : MonoBehaviour
             {
                 _vertices[i] = new Vector3(x,0,z);
                 i++;
+                //yield return new WaitForEndOfFrame();
             }
         }
 
@@ -74,6 +89,7 @@ public class MeshCreator : MonoBehaviour
                 meshCollider.sharedMesh = meshfilter.mesh;
             }
             vert++;
+            //yield return new WaitForEndOfFrame();
         }
 
         Colors = new Color[_vertices.Length];
@@ -87,6 +103,7 @@ public class MeshCreator : MonoBehaviour
                 i++;
             }
         }
+       yield return new WaitForEndOfFrame();
     }
     public void UpdateMesh()
     {
@@ -151,23 +168,30 @@ public class MeshCreator : MonoBehaviour
     }
     public void ResetWorld()
     {
-        for (int i = 0; i < _vertices.Length; i++)
-        {
-            _vertices[i] = new Vector3(_vertices[i].x,0, _vertices[i].z);
-        }
+        CreateNewWorld(_xSize,_zSize);
         UpdateMesh();
+        CameraScript cam = GameObject.FindObjectOfType<CameraScript>();
+        if (cam != null)
+        {
+            cam.UpdatePosition();
+        }
+        else
+        {
+            Debug.LogWarning("Camera not found to set position");
+        }
     }   
-    public void CreateNewWorld(int value)
+    public void CreateNewWorld(int Xsize,int Zsize)
     {
-        _xSize = value;
-        _zSize = value;
+        _xSize = Xsize;
+        _zSize = Zsize;
         mesh = new Mesh();
         _MeshRenderer = GetComponent<MeshRenderer>();
         GetComponent<MeshFilter>().mesh = mesh;
         meshCollider = GetComponent<MeshCollider>();
         meshfilter = GetComponent<MeshFilter>();
-        CreateShape();
+        StartCoroutine(CreateShape());
         UpdateMesh();
+        Debug.Log("Novo mundo Criado");
     }    
 
     public void LoadWorld(Vector3[] vertice, int[] triangles, int xSize, int ZSize)
@@ -178,5 +202,28 @@ public class MeshCreator : MonoBehaviour
         _zSize = ZSize;
 
         UpdateMesh();
+    }
+
+    public void SetWightSizeWorld(float value)
+    {
+        _xSize = (int)value;
+        if(Text_XSize!=null) Text_XSize.SetText(value.ToString());
+    }
+    public void SetheightSizeWorld(float value)
+    {
+        _zSize = (int)value;
+        if (Text_ZSize != null) Text_ZSize.SetText(value.ToString());
+    }
+
+    public void SetMinY(float value)
+    {
+        LimteMin = (int) value;
+        if (Text_MinY != null) Text_MinY.SetText(value.ToString());
+    }
+    public void SetMaxY(float value)
+
+    {
+        LimteMax = (int)value;
+        if (Text_MaxY != null) Text_MaxY.SetText(value.ToString());
     }
 }

@@ -14,10 +14,6 @@ public class CameraScript : MonoBehaviour
         InicialPos = transform.position;
         transform.position =  mesh.getCenterPosition()+InicialPos;
         cam = GetComponent<Camera>();
-    }
-
-    private void Update()
-    {
         UpdatePosition();
     }
     public void UpdatePosition()

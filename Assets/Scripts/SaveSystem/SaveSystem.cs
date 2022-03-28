@@ -4,8 +4,9 @@ using UnityEngine;
 
 public static class SaveSystem
 {
-    public static void SAVE( string FolderName,string WorldName)
+    public static void SAVE(string _Path, string FileName)
     {
+        string FinalFileName = _Path;
         MeshCreator mesh = GameObject.FindObjectOfType<MeshCreator>();
         SaveData save = new SaveData
         {
@@ -15,35 +16,30 @@ public static class SaveSystem
             zSize = mesh._zSize
         };
         string json = JsonUtility.ToJson(save);        
-        if (!Directory.Exists(Application.dataPath + "/" + FolderName)) // SE NAO EXISTIR A PASTA, ELE CRIA UMA
+        /*if (!Directory.Exists(FinalFileName)) // SE NAO EXISTIR A PASTA, ELE CRIA UMA
         {
-            Directory.CreateDirectory(Application.dataPath + "/" + FolderName);
-        }
-        File.WriteAllText(Application.dataPath + "/" + FolderName +"/"+ WorldName, json);
-        Debug.Log("saved IN:"+ Application.dataPath + "/" + FolderName + "/" + WorldName + "\n" + json);
+            Directory.CreateDirectory(FinalFileName);
+        }        */
+        File.WriteAllText(FinalFileName, json);
+        Debug.Log("saved IN:"+ FinalFileName + "\n" + json);
 
     }
-    public static void LOADSAVE(string FolderName, string WorldName)
-    {
-        string path = Application.dataPath + "/" + FolderName + "/" + WorldName;
+    public static void LOADSAVE(string Path, string jsondata="")
+    { 
         //SE JA EXISTER SAVE
-        if (File.Exists(path))
+        if (File.Exists(Path))
         {
-            string saveString = File.ReadAllText(Application.dataPath + "/" + FolderName + "/" + WorldName);
+            string saveString = File.ReadAllText(Path);
             SaveData save = JsonUtility.FromJson<SaveData>(saveString);
             MeshCreator mesh = GameObject.FindObjectOfType<MeshCreator>();
             mesh.LoadWorld(save.vertices,save.triangles,save.xSize,save.zSize);
-            Debug.Log("saved :" + "\n" + saveString);
+            Debug.Log("loaded :" + "\n" + saveString);
         }
         //SE NÂO EXISTIR SAVE
         else
         {
-            Debug.Log("NENHUM SAVE ENCONTRADO" + path);
-            NEWSAVE(FolderName,WorldName);
+            Debug.Log("NENHUM SAVE ENCONTRADO" + Path);
+            //NEWSAVE(FolderName,WorldName);
         }
-    }
-    public static void NEWSAVE(string FolderName, string WorldName)
-    {        
-        SaveSystem.SAVE(FolderName,WorldName);
     }
 }
